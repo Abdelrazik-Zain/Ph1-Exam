@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Physics & Electricity Final Exam</title>
+<style>
+body{
+    margin:0;
+    font-family:"Segoe UI",Arial;
+    background:#f4f6f9;
+}
+.screen{
+    display:none;
+    min-height:100vh;
+    align-items:center;
+    justify-content:center;
+}
+.card{
+    background:#fff;
+    padding:30px;
+    border-radius:10px;
+    width:400px;
+    box-shadow:0 10px 30px rgba(0,0,0,.1);
+    text-align:center;
+}
+input,button{
+    width:100%;
+    padding:10px;
+    margin:10px 0;
+    font-size:15px;
+}
+button{
+    background:#1e293b;
+    color:#fff;
+    border:none;
+    border-radius:6px;
+    cursor:pointer;
+}
+button:hover{opacity:.9}
+
+/* Exam */
+header{
+    background:#1e293b;
+    color:#fff;
+    padding:15px;
+    display:flex;
+    justify-content:space-between;
+}
+.container{
+    display:flex;
+    padding:20px;
+}
+.exam-area{flex:1;margin-right:20px}
+.question{
+    background:#fff;
+    padding:20px;
+    border-radius:10px;
+    display:none;
+}
+#nav{
+    width:160px;
+    background:#fff;
+    padding:10px;
+    border-radius:10px;
+}
+.nav-item{
+    width:34px;height:34px;
+    background:#d1d5db;
+    display:inline-flex;
+    justify-content:center;
+    align-items:center;
+    margin:4px;
+    border-radius:6px;
+    cursor:pointer;
+}
+.green{background:#22c55e;color:#fff}
+.red{background:#ef4444;color:#fff}
+</style>
+</head>
+
+<body>
+
+<!-- LOGIN -->
+<div id="login" class="screen" style="display:flex">
+    <div class="card">
+        <h2>Exam Login</h2>
+        <input id="studentName" placeholder="Student Name">
+        <input id="examCode" placeholder="Student Code">
+        <button onclick="startExam()">Start Exam</button>
+    </div>
+</div>
+
+<!-- EXAM -->
+<div id="examScreen" class="screen">
+<header>
+    <div>Physics & Electricity Final Exam</div>
+    <div id="timer">02:00:00</div>
+</header>
+
+<div class="container">
+    <div class="exam-area" id="exam"></div>
+    <div id="nav"></div>
+</div>
+
+<div style="text-align:center;margin-bottom:20px">
+    <button onclick="prevQ()">Previous</button>
+    <button onclick="nextQ()">Next</button>
+    <button onclick="endExam()">End Exam</button>
+</div>
+</div>
+
+<!-- RESULT -->
+<div id="result" class="screen">
+    <div class="card">
+        <h2>Exam Result</h2>
+        <p id="studentInfo"></p>
+        <p id="score"></p>
+        <p id="percent"></p>
+        <hr>
+        <small>Made by Abdelrazik<br>Thank You</small>
+    </div>
+</div>
+
+<script>
+// ===== LOGIN =====
+let student="";
+function startExam(){
+    student=document.getElementById("studentName").value;
+    if(student=="" || examCode.value==""){
+        alert("Please enter name and exam code");
+        return;
+    }
+    login.style.display="none";
+    examScreen.style.display="block";
+    startTimer();
+    showQ(0);
+}
+
+// ===== TIMER =====
+let timeLeft=2*60*60;
+function startTimer(){
+    setInterval(()=>{
+        let h=Math.floor(timeLeft/3600);
+        let m=Math.floor((timeLeft%3600)/60);
+        let s=timeLeft%60;
+        timer.innerHTML=`${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+        if(timeLeft<=0) endExam();
+        timeLeft--;
+    },1000);
+}
+
+// ===== QUESTIONS =====
+let questions = [
+{q:"Which of the following is an ohmic material?",o:["A material where current is proportional to voltage","A material where resistance changes with voltage","A semiconductor diode","A room-temperature superconductor"],c:0},
+{q:"The resistance of a wire is directly proportional to its:",o:["Length","Area","Voltage","Current"],c:0},
+{q:"If the cross-sectional area of a wire is doubled, resistance:",o:["Decreases by half","Doubles","Quadruples","Stays same"],c:0},
+{q:"Resistivity depends on:",o:["Material type and temperature","Length","Shape","Current"],c:0},
+{q:"For most metals, when temperature increases, resistance:",o:["Increases","Decreases","Zero","Constant"],c:0},
+{q:"Rate of converting electrical energy is called:",o:["Charge","Power","Capacitance","Voltage"],c:1},
+{q:"Which formula calculates electrical power?",o:["P=IV","P=I²R","P=V²/R","All"],c:3},
+{q:"10 C pass in 2 s, current equals:",o:["20 A","5 A","2 A","12 A"],c:1},
+{q:"10 Ω connected to 120 V gives current:",o:["1.2 A","12 A","120 A","1200 A"],c:1},
+{q:"Most dangerous factor in electric shock:",o:["Voltage","Resistance","Current","Wire color"],c:2},
+
+{q:"Primary function of capacitor:",o:["Create resistance","Store charge and energy","Convert AC to DC","Measure field"],c:1},
+{q:"Charge stored in capacitor depends on:",o:["Voltage & capacitance","Current","Resistance","Wire length"],c:0},
+{q:"Capacitance proportional to:",o:["Plate distance","Plate area","Voltage","Current"],c:1},
+{q:"Doubling plate distance makes capacitance:",o:["Double","Quadruple","Half","Same"],c:2},
+{q:"Insulating material in capacitor:",o:["Conductor","Semiconductor","Dielectric","Electrolyte"],c:2},
+{q:"Dielectric insertion causes capacitance to:",o:["Decrease","Increase","No effect","Explode"],c:1},
+{q:"Energy in capacitor stored in:",o:["Plates","Wires","Electric field","Battery"],c:2},
+{q:"Parallel capacitors total capacitance:",o:["Less than smallest","Sum","Reciprocal","Zero"],c:1},
+{q:"Series capacitors have same:",o:["Voltage","Charge","Capacitance","Energy"],c:1},
+{q:"Dielectric constant is:",o:["Max voltage","Capacitance ratio","Electron speed","Resistance"],c:1},
+
+{q:"Dielectric breakdown occurs when:",o:["Disconnected","Field ionizes material","Capacitance zero","Large area"],c:1},
+{q:"10 μF charged to 100 V stores charge:",o:["1 mC","1000 C","10 C","0.1 C"],c:0},
+{q:"Two identical capacitors in series give:",o:["2C","C","C/2","Zero"],c:2},
+{q:"Common capacitor application:",o:["Heaters","Defibrillators","Light filaments","Current source"],c:1},
+{q:"Electric field between plates equals:",o:["Vd","V/d","Q/C","½CV"],c:1},
+{q:"Spherical capacitor consists of:",o:["Used in space","Two concentric spheres","Wire","No energy"],c:1},
+{q:"Polarization in dielectric means:",o:["Melting","Dipole alignment","Circular current","Charge removal"],c:1},
+{q:"Work by conservative force equals:",o:["ΔKE","−ΔPE","F×t","E²"],c:1},
+{q:"Potential energy of two charges:",o:["kq₁q₂/r","kq₁q₂/r²","qE","½mv²"],c:0},
+{q:"Electric potential defined as:",o:["Energy/mass","Energy/charge","Charge/volume","Force"],c:1},
+
+{q:"SI unit of electric potential:",o:["Joule","Coulomb","Volt","Watt"],c:2},
+{q:"One volt equals:",o:["N/C","J/C","J·m","A/Ω"],c:1},
+{q:"Electron-volt measures:",o:["Voltage","Charge","Energy","Potential"],c:2},
+{q:"1 eV in joules equals:",o:["1.6×10⁻¹⁹","9.11×10⁻³¹","6.63×10⁻³⁴","3×10⁸"],c:0},
+{q:"Region of equal potential is:",o:["Isothermal","Equipotential","Isobaric","Field line"],c:1},
+{q:"Angle between field lines and equipotentials:",o:["0°","45°","90°","180°"],c:2},
+{q:"Potential of point charge:",o:["k/r²","k/r","qEd","kqr"],c:1},
+{q:"Potential difference in uniform field:",o:["E/d","Ed²","−Ed","kQ/d"],c:2},
+{q:"Superposition for potential means:",o:["Vector sum","Algebraic sum","Cancel","Largest only"],c:1},
+{q:"Conductor in equilibrium:",o:["Higher inside","Same potential","Max field","Volume charge"],c:1},
+
+{q:"Positive charge moving with field:",o:["U increases","U decreases","V constant","Slows"],c:1},
+{q:"Electric field from potential:",o:["Integration","−∇V","Multiply by q","Square root"],c:1},
+{q:"Lightning due to huge:",o:["Magnetic field","Potential difference","Gravity","Resistance"],c:1},
+{q:"Work along equipotential:",o:["Positive","Negative","Zero","Infinite"],c:2},
+{q:"Car battery stores more energy because:",o:["Higher V","More total Q","Less R","Chemicals"],c:1},
+{q:"Grounding a conductor means:",o:["Zero potential connection","Floor","Remove atoms","Infinite V"],c:0},
+{q:"Tripling distance from charge makes V:",o:["Triple","×9","One-third","One-ninth"],c:2},
+{q:"Two types of electric charge:",o:["High/Low","Positive/Negative","North/South","Hot/Cold"],c:1},
+{q:"Conservation of charge:",o:["Created","Constant total","Changes sign","Increases"],c:1},
+{q:"Material allowing free charge flow:",o:["Insulator","Semiconductor","Conductor","Dielectric"],c:2},
+
+{q:"Charging without touching:",o:["Conduction","Friction","Induction","Polarization"],c:2},
+{q:"SI unit of charge:",o:["Newton","Volt","Coulomb","Joule"],c:2},
+{q:"Magnitude of elementary charge:",o:["9.11×10⁻³¹","1.6×10⁻¹⁹","6.67×10⁻¹¹","8.85×10⁻¹²"],c:1},
+{q:"Coulomb force inversely proportional to:",o:["Charge product","Distance","Distance²","Permittivity"],c:2},
+{q:"Doubling distance makes force:",o:["Double","Half","Quarter","×4"],c:2},
+{q:"Electrostatic constant k ≈",o:["1.6×10⁻¹⁹","8.85×10⁻¹²","8.99×10⁹","6.63×10⁻³⁴"],c:2},
+{q:"Electric field definition:",o:["F×q","F/q","kQ/r","W/q"],c:1},
+{q:"Field lines direction:",o:["Toward +","Away from +","Parallel","Circles"],c:1},
+{q:"Field line density proportional to:",o:["Charge","Distance","Field magnitude","Energy"],c:2},
+{q:"Force on a charge q in electric field E is:",o:["q/E","E/q","qE","k/qE"],c:2},
+{q:"A common insulator is:",o:["Copper","Aluminum","Glass","Silver"],c:2},
+{q:"Two positive charges will:",o:["Attract","Repel","Neutralize","Disappear"],c:1},
+
+{q:"Relation between ε₀ and k is:",o:["k=4π","k=1/4πε₀","k=4π²","k=0"],c:1},
+{q:"Torque on a dipole depends on:",o:["Dipole moment","Field strength","Angle","All of the above"],c:3},
+{q:"Fundamental electric quantity is:",o:["Voltage","Current","Charge","Resistance"],c:2},
+{q:"Charge of one electron equals:",o:["+1.6×10⁻¹⁹ C","−1.6×10⁻¹⁹ C","0 C","1 C"],c:1},
+{q:"Electric current is flow of:",o:["Protons","Neutrons","Electrons","Atoms"],c:2},
+
+{q:"One ampere equals:",o:["V/Ω","J/C","C/s","W/s"],c:2},
+{q:"In water analogy, current represents:",o:["Pressure","Tank size","Water flow","Pump"],c:2},
+{q:"Voltage is also called:",o:["Electric flow","Potential difference","Kinetic charge","Magnetic flux"],c:1},
+{q:"If 1 J moves 1 C, the voltage is:",o:["1 A","1 W","1 V","1 Ω"],c:2},
+{q:"Electrical power equals:",o:["V×R","I×R","V×I","Q×t"],c:2},
+
+{q:"Passive sign convention means:",o:["Power supplied","Power absorbed","Zero voltage","Infinite resistance"],c:1},
+{q:"Ideal voltage source:",o:["Changes V with I","Maintains fixed V","AC only","Infinite R"],c:1},
+{q:"Active circuit element is:",o:["Resistor","Capacitor","Battery","Inductor"],c:2},
+{q:"Ohm’s law relates:",o:["Q,T,E","V,I,R","P,V,C","L,F"],c:1},
+{q:"Conductance is reciprocal of:",o:["Voltage","Current","Resistance","Power"],c:2},
+
+{q:"Short circuit has:",o:["Infinite R","Zero R","Zero I","High V"],c:1},
+{q:"Sum of currents at node (KCL) equals:",o:["Voltage","Zero","Infinity","Resistance"],c:1},
+{q:"Transformer is used to:",o:["Store DC","Transfer energy magnetically","Measure R","Block AC"],c:1},
+{q:"Basic atomic particles are:",o:["P,P,E","P,N,E","Atoms","Molecules"],c:1},
+{q:"If V increases and R constant, I:",o:["Increases","Decreases","Constant","Zero"],c:0},
+
+{q:"Total resistance in series equals:",o:["Average","Reciprocal","Sum","Largest"],c:2},
+{q:"Cycles per second in AC is:",o:["Voltage","Amplitude","Frequency","Phase"],c:2},
+{q:"Transformer for audio impedance matching:",o:["Power","HF","Audio","Isolation"],c:2},
+{q:"Electron theory particles:",o:["P,Photons,E","P,N,E","Positrons","Atoms"],c:1},
+{q:"Negative charge in atom is:",o:["Nucleus","Proton","Neutron","Electron"],c:3},
+
+{q:"Materials with many free electrons are:",o:["Insulators","Semiconductors","Conductors","Dielectrics"],c:2},
+{q:"Common semiconductor material:",o:["Copper","Silicon","Rubber","Gold"],c:1},
+{q:"Force causing electron motion is:",o:["Resistance","Current","Voltage","Power"],c:2},
+{q:"Unit of electric current:",o:["Volt","Ohm","Watt","Ampere"],c:3},
+{q:"Resistance property:",o:["Increases flow","Opposes current","Stores charge","Creates field"],c:1},
+
+{q:"Ohm’s law formula is:",o:["P=IV","V=IR","R=VI","I=R/V"],c:1},
+{q:"Parallel circuit voltage is:",o:["Divided","Same as source","Higher","Zero"],c:1},
+{q:"Unit of electrical power:",o:["Ampere","Volt","Watt","Joule"],c:2},
+{q:"Magnetism strongest at:",o:["Center","Poles","Edges","Everywhere"],c:1},
+{q:"Current in coil around iron core creates:",o:["Insulator","Electromagnet","No resistance","Static charge"],c:1},
+
+{q:"Main difference between DC and AC:",o:["DC changes","DC one direction","AC one direction","No difference"],c:1},
+{q:"Sine wave represents:",o:["DC","Resistance","AC","Static charge"],c:2},
+{q:"AC cycles per second called:",o:["Voltage","Amplitude","Frequency","Phase"],c:2},
+{q:"Inductance opposes change in:",o:["Voltage","Resistance","Current","Temperature"],c:2},
+{q:"Three-phase AC used in:",o:["Flashlights","Homes","Industry","Toys"],c:2}
+];
+
+let current=0,visited=[];
+questions.forEach((x,i)=>{
+    visited[i]=false;
+    exam.innerHTML+=`<div class="question" id="q${i}">
+        <p>${i+1}) ${x.q}</p>
+        ${x.o.map((o,j)=>`<label><input type="radio" name="q${i}" value="${j}" onchange="updateNav(${i})"> ${o}</label><br>`).join("")}
+    </div>`;
+    nav.innerHTML+=`<div class="nav-item" onclick="goTo(${i})">${i+1}</div>`;
+});
+
+function showQ(i){
+    document.querySelectorAll(".question").forEach(q=>q.style.display="none");
+    document.getElementById("q"+i).style.display="block";
+    visited[i]=true;
+}
+function nextQ(){updateNav(current);if(current<questions.length-1)showQ(++current);}
+function prevQ(){updateNav(current);if(current>0)showQ(--current);}
+function goTo(i){updateNav(current);current=i;showQ(i);}
+function updateNav(i){
+    let answered=document.querySelector(`input[name="q${i}"]:checked`);
+    nav.children[i].className="nav-item "+(answered?"green":visited[i]?"red":"");
+}
+
+// ===== END & RESULT =====
+function endExam(){
+    examScreen.style.display="none";
+    result.style.display="flex";
+    let score=0;
+    questions.forEach((x,i)=>{
+        let s=document.querySelector(`input[name="q${i}"]:checked`);
+        if(s && +s.value===x.c) score++;
+    });
+    studentInfo.innerHTML=`Student: <b>${student}</b>`;
+    scoreEl.innerHTML=`Score: ${score} / ${questions.length}`;
+    percent.innerHTML=`Percentage: ${(score/questions.length*100).toFixed(2)}%`;
+}
+const scoreEl=document.getElementById("score");
+</script>
+
+</body>
+</html>

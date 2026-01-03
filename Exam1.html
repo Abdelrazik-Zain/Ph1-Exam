@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Physics & Electricity Final Exam</title>
+<style>
+body{
+    margin:0;
+    font-family:"Segoe UI",Arial;
+    background:#f4f6f9;
+}
+.screen{
+    display:none;
+    min-height:100vh;
+    align-items:center;
+    justify-content:center;
+}
+.card{
+    background:#fff;
+    padding:30px;
+    border-radius:10px;
+    width:400px;
+    box-shadow:0 10px 30px rgba(0,0,0,.1);
+    text-align:center;
+}
+input,button{
+    width:100%;
+    padding:10px;
+    margin:10px 0;
+    font-size:15px;
+}
+button{
+    background:#1e293b;
+    color:#fff;
+    border:none;
+    border-radius:6px;
+    cursor:pointer;
+}
+button:hover{opacity:.9}
+
+/* Exam */
+header{
+    background:#1e293b;
+    color:#fff;
+    padding:15px;
+    display:flex;
+    justify-content:space-between;
+}
+.container{
+    display:flex;
+    padding:20px;
+}
+.exam-area{flex:1;margin-right:20px}
+.question{
+    background:#fff;
+    padding:20px;
+    border-radius:10px;
+    display:none;
+}
+#nav{
+    width:160px;
+    background:#fff;
+    padding:10px;
+    border-radius:10px;
+}
+.nav-item{
+    width:34px;height:34px;
+    background:#d1d5db;
+    display:inline-flex;
+    justify-content:center;
+    align-items:center;
+    margin:4px;
+    border-radius:6px;
+    cursor:pointer;
+}
+.green{background:#22c55e;color:#fff}
+.red{background:#ef4444;color:#fff}
+</style>
+</head>
+
+<body>
+
+<!-- LOGIN -->
+<div id="login" class="screen" style="display:flex">
+    <div class="card">
+        <h2>Exam Login</h2>
+        <input id="studentName" placeholder="Student Name">
+        <input id="examCode" placeholder="Student Code">
+        <button onclick="startExam()">Start Exam</button>
+    </div>
+</div>
+
+<!-- EXAM -->
+<div id="examScreen" class="screen">
+<header>
+    <div>Physics & Electricity Final Exam</div>
+    <div id="timer">02:00:00</div>
+</header>
+
+<div class="container">
+    <div class="exam-area" id="exam"></div>
+    <div id="nav"></div>
+</div>
+
+<div style="text-align:center;margin-bottom:20px">
+    <button onclick="prevQ()">Previous</button>
+    <button onclick="nextQ()">Next</button>
+    <button onclick="endExam()">End Exam</button>
+</div>
+</div>
+
+<!-- RESULT -->
+<div id="result" class="screen">
+    <div class="card">
+        <h2>Exam Result</h2>
+        <p id="studentInfo"></p>
+        <p id="score"></p>
+        <p id="percent"></p>
+        <hr>
+        <small>Made by Abdelrazik<br>Thank You</small>
+    </div>
+</div>
+
+<script>
+// ===== LOGIN =====
+let student="";
+function startExam(){
+    student=document.getElementById("studentName").value;
+    if(student=="" || examCode.value==""){
+        alert("Please enter name and exam code");
+        return;
+    }
+    login.style.display="none";
+    examScreen.style.display="block";
+    startTimer();
+    showQ(0);
+}
+
+// ===== TIMER =====
+let timeLeft=2*60*60;
+function startTimer(){
+    setInterval(()=>{
+        let h=Math.floor(timeLeft/3600);
+        let m=Math.floor((timeLeft%3600)/60);
+        let s=timeLeft%60;
+        timer.innerHTML=`${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+        if(timeLeft<=0) endExam();
+        timeLeft--;
+    },1000);
+}
+
+// ===== QUESTIONS =====
+let questions = [
+
+{q:"A lack of electrons of one terminal of a battery results in a:",o:["Negative charge","Positive charge","Neutral charge","Magnetic charge"],c:1},
+{q:"A 100-watt lamp converts energy ..... than a 150-watt lamp.",o:["slower","faster","at the same rate","with more resistance"],c:0},
+{q:"A capacitor is an element that:",o:["Dissipates energy as heat","Stores energy in an electric field","Stores energy in a magnetic field","Generates voltage"],c:1},
+{q:"A circuit has a current of 2 A and a resistance of 1 k Ohms. What is the voltage?",o:["2 V","20 V","200 V","2000 V"],c:3},
+{q:"A circuit with four equal (25 Ω) resistors in series has a total current of 30 mA. What is the voltage drop across one resistor?",o:["3 V","30 V","33 V","300 V"],c:0},
+{q:"A modern ceramic capacitor is labeled \"106M\". What is its capacitance value?",o:["106 MF","16 F","106 pF","10 µF"],c:3},
+{q:"A modern ceramic capacitor is labeled \"155M\". What is its capacitance value?",o:["155 MΩ","155 pF","15 pF","1.5 µF"],c:3},
+{q:"A parallel circuit is formed when two or more resistances are placed side-by-side, allowing current to flow through:",o:["Zero paths","Only one path","Multiple paths","The path of high resistance"],c:2},
+{q:"A resistor has the following color bands: Violet, Yellow, Brown, Red. What is its value?",o:["470","740","7400","4700"],c:1},
+{q:"A resistor has the following color bands: Yellow, Violet, Red, Brown. What is its value?",o:["470","740","7400","4700"],c:3},
+
+{q:"A resistor is described as a ..... element because it converts electrical energy into heat.",o:["passive-storage","generative","dissipative","storage"],c:2},
+{q:"A series circuit is formed when resistors are connected end-to-end, providing how many paths for current?",o:["Zero paths","Only one path","Multiple paths","The path of high resistance"],c:1},
+{q:"A variable resistor is also known as a:",o:["Potentiometer","Capacitor","Diode","Switch"],c:0},
+{q:"According to Kirchhoff's Voltage Law, the algebraic sum of voltage around a loop is:",o:["Equal to the current","Zero","Infinite","Equal to the first resistor"],c:1},
+{q:"According to the Electron Flow Theory, electrons flow from:",o:["Positive to Negative","Negative to Positive","North to South","High resistance to Low resistance"],c:1},
+{q:"An ammeter must have a very ..... input impedance.",o:["normal","Medium","high","low"],c:3},
+{q:"An inductor stores energy in the form of:",o:["An electric field","A magnetic field","Heat","Chemical reaction"],c:1},
+{q:"A voltmeter must have a very ..... input impedance.",o:["normal","Medium","high","low"],c:2},
+{q:"As the length of a conductor increases, its resistance:",o:["Decreases","Increases","Remains the same","Becomes zero"],c:1},
+{q:"Capacitance (C) is ____ proportional to the distance (d) between the plates.",o:["exponentially","logarithmically","inversely","directly"],c:2},
+
+{q:"Capacitance (C) is ____ proportional to the surface area (A) of the plates.",o:["exponentially","logarithmically","inversely","directly"],c:3},
+{q:"Capacitance is formed by:",o:["A coil of wire","Two conductive plates separated by an insulator","Two resistors in series","A semiconductor junction"],c:1},
+{q:"Coulomb's Law states that the force between charged bodies is directly proportional to:",o:["The product of the charges","The square of the distance","The mass of the bodies","The voltage applied"],c:0},
+{q:"Coulomb's Law states that the force between charged bodies is inversely proportional to:",o:["The product of the charges","The square of the distance","The mass of the bodies","The voltage applied"],c:1},
+{q:"Electric field lines point:",o:["Away from positive charges and toward negative charges","Toward positive charges and away from negative charges","Parallel to equipotential surfaces","Randomly"],c:0},
+{q:"Electrons in the outer band that transport current are called:",o:["Bound electrons","Stationary electrons","Free electrons","Neutral electrons"],c:2},
+{q:"Equipment is rated in wattage to indicate:",o:["The voltage it requires","The rate it converts electrical energy","How much current it stores","Its weight"],c:1},
+{q:"How does current behave in a series circuit?",o:["the same in the circuit","Divides equally","Highest at smallest R","Varies"],c:0},
+{q:"How does voltage behave in a parallel circuit?",o:["the same in the circuit","Same across each resistor","Divides equally","Highest at smallest R"],c:1},
+{q:"How must a voltmeter be connected to measure potential difference?",o:["Power off","Parallel with power on","Series with power on","Power off circuit"],c:1},
+
+{q:"How must an ammeter be connected to measure current?",o:["Power off","Parallel","Series","Disconnected"],c:2},
+{q:"How must an ohmmeter be connected to measure resistance?",o:["No power","Parallel","Series","Power on"],c:0},
+{q:"In a conductor, free electrons are:",o:["Bound","Non-existent","Free to move","Positive"],c:2},
+{q:"Kirchhoff's Current Law states:",o:["Voltage drops equal source","Sum of currents is zero","Resistance rises","Power conserved"],c:1},
+{q:"Kirchhoff's Voltage Law states:",o:["Current equal","Sum of voltages equals supply","Parallel adds","P=VI"],c:1},
+{q:"Most common ceramic capacitors use what method to indicate value?",o:["Dial","Stamped","Alphanumeric","Color bars"],c:2},
+{q:"Most common resistors use what method to indicate value?",o:["Dial","Stamped","Alphanumeric","Color bars"],c:3},
+{q:"Most common transistors use what method to indicate value?",o:["Dial","Stamped","Alphanumeric","Color bars"],c:2},
+{q:"Most common variable resistors use what method to indicate value?",o:["Dial","Stamped","Alphanumeric","Color bars"],c:0},
+{q:"Ohm's Law states that current varies directly with:",o:["Power","Resistance","Current","Voltage"],c:3},
+
+{q:"Ohm's Law states that current varies inversely with:",o:["Power","Resistance","Current","Voltage"],c:1},
+{q:"On a standard 4-band resistor, what does the fourth band represent?",o:["Tolerance","Multiplier","Second digit","First digit"],c:0},
+{q:"On a standard 4-band resistor, what does the third band represent?",o:["Tolerance","Multiplier","Second digit","First digit"],c:1},
+{q:"The Coulomb Force is also known as:",o:["Electrostatic force","Gravitational","Centrifugal","Friction"],c:0},
+{q:"The force of attraction or repulsion between charges depends on:",o:["Strength and distance","Mass","Time","Temperature"],c:0},
+{q:"The Law of Conservation of Charge states:",o:["Charge decreases","Cannot be created or destroyed","Only open systems","Positive destroys negative"],c:1},
+{q:"The number of cycles per second is called:",o:["Amplitude","Voltage","Frequency","Period"],c:2},
+{q:"The unit of capacitance is:",o:["Henry","Farad","Ohm","Coulomb"],c:1},
+{q:"The unit of inductance is:",o:["Farad","Henry","Watt","Maxwell"],c:1},
+{q:"The unit of measurement for current is:",o:["Watt","Ohm","Volt","Ampere"],c:3},
+
+{q:"The unit of measurement for electric charge is:",o:["Joule","Watt","Coulomb","Volt"],c:2},
+{q:"The unit of measurement for potential is:",o:["Watt","Ohm","Volt","Ampere"],c:2},
+{q:"The unit of measurement for power is:",o:["Watt","Ohm","Volt","Ampere"],c:0},
+{q:"The unit of measurement for resistance is:",o:["Watt","Ohm","Volt","Ampere"],c:1},
+{q:"The water analogy for a rubber diaphragm sealing a pipe is:",o:["Inductor","Wires","Capacitor","Resistor"],c:2},
+{q:"The water analogy for a turbine or flywheel is:",o:["Inductor","Wires","Capacitor","Resistor"],c:0},
+{q:"The water analogy for water flow rate is:",o:["Source","Charge","Current","Resistance"],c:2},
+{q:"The water analogy for a water pump is:",o:["Source","Charge","Current","Resistance"],c:0},
+{q:"The water analogy for water quantity is:",o:["Source","Charge","Current","Resistance"],c:1},
+{q:"The water analogy for pipes getting smaller to limit flow is:",o:["Inductor","Wires","Capacitor","Resistor"],c:3},
+
+{q:"Transistors and diodes are examples of:",o:["Conductors","Semiconductors","Resistors","Insulators"],c:1},
+{q:"Using Ohm's Law, what is the current in a circuit with 12V and 6Ω?",o:["1A","2A","3A","4A"],c:1},
+{q:"What happens to a capacitor when current flows opposite to charging?",o:["Explodes","Discharges","Increases C","Becomes inductor"],c:1},
+{q:"What happens when current flows through a resistive material?",o:["Cools","Generates heat","Magnetic","Generates voltage"],c:1},
+{q:"What is called the flow of free electrons?",o:["Power","Resistance","Current","Voltage"],c:2},
+{q:"What is called the invisible field around a charged body?",o:["Gravitational","Electric field","Magnetic spectrum","Ozone"],c:1},
+{q:"What is called the rate at which work is done?",o:["Power","Resistance","Current","Voltage"],c:0},
+{q:"What is the common waveform for AC?",o:["Square","Sine","Sawtooth","Flat"],c:1},
+{q:"What is the common waveform for DC?",o:["Square","Sine","Sawtooth","Flat"],c:3},
+{q:"What is the force applied to cause current flow?",o:["Power","Resistance","Current","Voltage"],c:3},
+
+{q:"What is the property that opposes current flow?",o:["Power","Resistance","Current","Voltage"],c:1},
+{q:"What tolerance percent (%) value is indicated by a silver band?",o:["1","5","10","20"],c:2},
+{q:"What tolerance percent (%) value if a resistor has no fourth band?",o:["1","5","10","20"],c:3},
+{q:"What type of material can be manufactured to act as a conductor and an insulator in the same circuit?",o:["Conductors","Semiconductors","Resistors","Insulators"],c:1},
+{q:"Which of the following functions is the Digital Multimeter used for?",o:["Generator, Motor, Switch","Ammeter, Voltmeter, Ohmmeter","Capacitor, Inductor, Resistor","Scope, Source, Ground"],c:1},
+{q:"Which of the following materials is listed as a good conductor?",o:["Plastic","Silicon","Aluminum","Copper"],c:3},
+{q:"Which of the following materials is listed as a good insulator?",o:["Plastic","Silicon","Aluminum","Copper"],c:0},
+{q:"Which of the following materials is listed as a semiconductor?",o:["Plastic","Silicon","Aluminum","Copper"],c:1},
+{q:"Which of the following materials allow few free electrons?",o:["Conductors","Semiconductors","Resistors","Insulators"],c:3},
+{q:"Which of the following materials permit many electrons to move freely?",o:["Conductors","Semiconductors","Resistors","Insulators"],c:0}
+];
+
+let current=0,visited=[];
+questions.forEach((x,i)=>{
+    visited[i]=false;
+    exam.innerHTML+=`<div class="question" id="q${i}">
+        <p>${i+1}) ${x.q}</p>
+        ${x.o.map((o,j)=>`<label><input type="radio" name="q${i}" value="${j}" onchange="updateNav(${i})"> ${o}</label><br>`).join("")}
+    </div>`;
+    nav.innerHTML+=`<div class="nav-item" onclick="goTo(${i})">${i+1}</div>`;
+});
+
+function showQ(i){
+    document.querySelectorAll(".question").forEach(q=>q.style.display="none");
+    document.getElementById("q"+i).style.display="block";
+    visited[i]=true;
+}
+function nextQ(){updateNav(current);if(current<questions.length-1)showQ(++current);}
+function prevQ(){updateNav(current);if(current>0)showQ(--current);}
+function goTo(i){updateNav(current);current=i;showQ(i);}
+function updateNav(i){
+    let answered=document.querySelector(`input[name="q${i}"]:checked`);
+    nav.children[i].className="nav-item "+(answered?"green":visited[i]?"red":"");
+}
+
+// ===== END & RESULT =====
+function endExam(){
+    examScreen.style.display="none";
+    result.style.display="flex";
+    let score=0;
+    questions.forEach((x,i)=>{
+        let s=document.querySelector(`input[name="q${i}"]:checked`);
+        if(s && +s.value===x.c) score++;
+    });
+    studentInfo.innerHTML=`Student: <b>${student}</b>`;
+    scoreEl.innerHTML=`Score: ${score} / ${questions.length}`;
+    percent.innerHTML=`Percentage: ${(score/questions.length*100).toFixed(2)}%`;
+}
+const scoreEl=document.getElementById("score");
+</script>
+
+</body>
+</html>
